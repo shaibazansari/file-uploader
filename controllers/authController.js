@@ -63,13 +63,8 @@ exports.login = async (req, res) => {
       setToken(user, res);
 
       res.status(201).json({
-        message: "Signup was successful",
-        user: {
-          firstName: profile?.given_name,
-          lastName: profile?.family_name,
-          picture: profile?.picture,
-          email: profile?.email,
-        },
+        message: "Login was successful",
+        user: user,
       });
     }
   } catch (error) {
@@ -83,14 +78,18 @@ exports.protect = async (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    throw new ErrorHandler(401, "You are not logged in! Please log in to get access");
+    return res.status(401).json({
+      message: "You are not logged in! Please log in to get access",
+    });
   }
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
-    throw new ErrorHandler(401, "The user belonging to this token does no longer exist");
+    return res.status(401).json({
+      message: "The user belonging to this token does no longer exist",
+    });
   }
 
   req.user = currentUser;
@@ -100,17 +99,29 @@ exports.protect = async (req, res, next) => {
 exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
     try {
+      const token = req.cookies.jwt;
+
+      if (!token) {
+        return res.status(401).json({
+          message: "You are not logged in! Please log in to get access",
+        });
+      }
+
       const decoded = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
 
       const currentUser = await User.findById(decoded.id);
       if (!currentUser) {
-        return next();
+        return res.status(401).json({
+          message: "The user belonging to this token does no longer exist",
+        });
       }
 
       res.locals.user = currentUser;
       return next();
     } catch (err) {
-      return next();
+      return res.status(401).json({
+        message: err,
+      });
     }
   }
   next();
