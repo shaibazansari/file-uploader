@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 
 const CLIENT_ID = "447235254500-rb8ssec8iu96cqqjnef09mee6ksp1aa3.apps.googleusercontent.com";
 
-function Login() {
+function Login({ setUser }) {
   const handleSuccess = (response) => {
     console.log(response);
-    fetch("http://localhost:9000/auth/login", {
+    fetch("/api/auth/login", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -18,9 +18,7 @@ function Login() {
       })
       .then((data) => {
         console.log("here ", data);
-        if (data?.user) {
-          localStorage.setItem("user", JSON.stringify(data?.user));
-        }
+        setUser(data.user)
       })
       .catch((error) => {
         // setError(error?.message);

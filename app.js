@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
+const path = require("path");
 const fileRouter = require("./routes/fileRoutes");
 const authRouter = require("./routes/userRoutes");
 
@@ -10,20 +10,20 @@ const app = express();
 
 // 1.Global Middleware
 const corsOptions = {
-  origin: true, //included origin as true
-  credentials: true, //included credentials as true
+  origin: true,
+  credentials: true,
 };
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api", fileRouter);
-app.use("/auth", authRouter);
+app.use(express.static(path.resolve(__dirname, '/client/dist')));
 
-app.all("*", (req, res, next) => {
-  // next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+app.use("/api/files", fileRouter);
+app.use("/api/auth", authRouter);
+
+app.all("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, '/client/dist', 'index.html'));
 });
 
-// Global error handling middleware
-// app.use(globalErrorHandler);
 module.exports = app;

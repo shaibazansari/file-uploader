@@ -19,7 +19,7 @@ function FileUpload() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("http://localhost:9000/api/uploadFile", {
+      const response = await fetch("/api/files/upload", {
         method: "POST",
         credentials: "include",
         body: formData,

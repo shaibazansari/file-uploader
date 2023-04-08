@@ -3,13 +3,12 @@ import FileUpload from "../fileupload/FileUpload";
 import FileList from "../fileupload/FileLIst";
 import Header from "../layout/Header";
 
-function Home() {
+function Home({ user }) {
   const [files, setFiles] = useState([]);
 
   const fetchFiles = async () => {
     try {
-      // Send a GET request to the backend API to fetch the list of files
-      const response = await fetch("http://localhost:9000/api/files", {
+      const response = await fetch("/api/files", {
         method: "GET",
         credentials: "include",
       });
@@ -32,7 +31,7 @@ function Home() {
 
   return (
     <>
-      <Header />
+      <Header user={user}/>
       <div className="content">
         <div className="container">
           <div className="card">

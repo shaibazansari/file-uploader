@@ -43,6 +43,7 @@ exports.login = async (req, res) => {
 
       if (verificationResponse.error) {
         return res.status(400).json({
+          status: "error",
           message: verificationResponse.error,
         });
       }
@@ -63,12 +64,14 @@ exports.login = async (req, res) => {
       setToken(user, res);
 
       res.status(201).json({
+        status: "success",
         message: "Login was successful",
         user: user,
       });
     }
   } catch (error) {
     res.status(500).json({
+      status: "error",
       message: "An error occured. Login failed.",
     });
   }
@@ -79,6 +82,7 @@ exports.protect = async (req, res, next) => {
 
   if (!token) {
     return res.status(401).json({
+      status: "error",
       message: "You are not logged in! Please log in to get access",
     });
   }
@@ -88,6 +92,7 @@ exports.protect = async (req, res, next) => {
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
     return res.status(401).json({
+      status: "error",
       message: "The user belonging to this token does no longer exist",
     });
   }
@@ -96,13 +101,12 @@ exports.protect = async (req, res, next) => {
   next();
 };
 
-exports.isLoggedIn = async (req, res, next) => {
-  if (req.cookies.jwt) {
+exports.checkLoggedIn = async (req, res, next) => {
+  const token = req.cookies.jwt;
     try {
-      const token = req.cookies.jwt;
-
       if (!token) {
         return res.status(401).json({
+          status: "error",
           message: "You are not logged in! Please log in to get access",
         });
       }
@@ -112,17 +116,20 @@ exports.isLoggedIn = async (req, res, next) => {
       const currentUser = await User.findById(decoded.id);
       if (!currentUser) {
         return res.status(401).json({
+          status: "error",
           message: "The user belonging to this token does no longer exist",
         });
       }
 
-      res.locals.user = currentUser;
-      return next();
+      return res.status(201).json({
+        status: "success",
+        message: "Login was successful",
+        user: currentUser,
+      });
     } catch (err) {
       return res.status(401).json({
+        status: "error",
         message: err,
       });
     }
-  }
-  next();
 };
