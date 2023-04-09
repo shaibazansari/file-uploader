@@ -11,7 +11,8 @@ exports.uploadFile = async (req, res) => {
     const newFile = new File({
       originalName: file.originalname,
       size: file.size,
-      filename: file.filename,
+      fileName: file.filename,
+      user: req.user._id
     });
 
     await newFile.save();
@@ -19,9 +20,11 @@ exports.uploadFile = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "File created",
+      data: {
+        file: newFile
+      }
     });
   } catch (error) {
-    console.log(error);
     if (fs.existsSync(path.join(UPLOAD_DIR, file.filename))) {
       fs.unlinkSync(path.join(UPLOAD_DIR, file.filename));
     }
@@ -31,8 +34,7 @@ exports.uploadFile = async (req, res) => {
 
 exports.getAllFiles = async (req, res) => {
   try {
-    // uploadedBy: req.user._ids
-    const files = await File.find({});
+    const files = await File.find({ user: req.user._id });
 
     res.status(200).json({ status: "success", message: "", data: { files } });
   } catch (error) {

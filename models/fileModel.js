@@ -7,6 +7,7 @@ const fileSchema = new mongoose.Schema({
   },
   fileName: {
     type: String,
+    unique: true,
     required: [true, "Uploaded file must have a unique name"],
   },
   size: { type: Number, required: true },

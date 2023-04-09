@@ -2,27 +2,25 @@ import { useState, useEffect } from "react";
 
 const CLIENT_ID = "447235254500-rb8ssec8iu96cqqjnef09mee6ksp1aa3.apps.googleusercontent.com";
 
-function Login({ setUser }) {
-  const handleSuccess = (response) => {
-    console.log(response);
-    fetch("/api/auth/login", {
+function Login({ handleSetUser }) {
+  const handleSuccess = async (data) => {
+    console.log(data);
+
+    const response = await fetch("/api/auth/login", {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ credential: response.credential }),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        console.log("here ", data);
-        setUser(data.user)
-      })
-      .catch((error) => {
-        // setError(error?.message);
-      });
+      body: JSON.stringify({ credential: data.credential }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      handleSetUser(data.user)
+    } else {
+      console.error("Failed to fetch files");
+    }
   };
   useEffect(() => {
     if (window.google) {

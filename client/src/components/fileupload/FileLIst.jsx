@@ -17,7 +17,7 @@ function FileList({ files }) {
           </tr>
         </thead>
         <tbody>
-          {files.map((file, index) => (
+          { !files.length ? <tr><td className="text-center" colSpan="5">No files Found</td></tr> : files.map((file, index) => (
             <tr key={file._id}>
               <th>{index + 1}</th>
               <td>{file.originalName}</td>

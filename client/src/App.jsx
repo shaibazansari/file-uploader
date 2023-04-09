@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import Home from "./components/pages/Home";
 import Login from "./components/pages/Login";
+import Loader from "./components/utils/Loader";
 import "./App.css";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const loadUser = async () => {
     try {
-      const response = await fetch("http://localhost:9000/auth/login", {
+      setLoading(true)
+      const response = await fetch("/api/auth/login", {
         method: "GET",
         credentials: "include",
       });
@@ -16,11 +19,11 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-      } else {
-        console.error("Failed to fetch files");
+        setLoading(false)
       }
     } catch (error) {
       console.error(error);
+      setLoading(false)
     }
   };
 
@@ -28,7 +31,11 @@ function App() {
     loadUser();
   }, []);
 
-  return user ? <Home user={user} /> : <Login setUser={setUser}/>;
+  const handleSetUser = user => {
+    setUser(user)
+  }
+
+  return loading ? <Loader /> : user ? <Home user={user} /> : <Login handleSetUser={handleSetUser}/>;
 }
 
 export default App;

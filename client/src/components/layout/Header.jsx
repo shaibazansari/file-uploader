@@ -5,7 +5,7 @@ function Header({ user }) {
         <a className="navbar-brand">File Uploader</a>
         <div className="user-info">
           <div className="avatar-img-wrap me-2">
-            <img src={"vite.svg"} className="avatar-img rounded-pill" alt="Avatar Logo" />
+            <img src={user.photo} className="avatar-img rounded-pill" alt="Avatar Logo" />
           </div>
           <span className="user-name">{ user.name }</span>
           <div className="logout-icon-wrap ms-3">

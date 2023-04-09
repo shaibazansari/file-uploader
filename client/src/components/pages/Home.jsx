@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import FileUpload from "../fileupload/FileUpload";
-import FileList from "../fileupload/FileLIst";
+import FileList from "../fileupload/FileList";
 import Header from "../layout/Header";
 
 function Home({ user }) {
@@ -25,9 +25,14 @@ function Home({ user }) {
     }
   };
 
+
   useEffect(() => {
     fetchFiles();
   }, []);
+
+  const addFile = file => {
+    setFiles( files => files.concat(file))
+  }
 
   return (
     <>
@@ -38,7 +43,7 @@ function Home({ user }) {
             <div className="card-header">File Uploader</div>
             <div className="card-body">
               <div className="file-uploader mt-2 mb-5">
-                <FileUpload />
+                <FileUpload addFile={addFile} />
               </div>
               <div className="file-list">
                 <FileList files={files} />

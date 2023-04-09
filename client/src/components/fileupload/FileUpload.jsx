@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function FileUpload() {
+function FileUpload({ addFile }) {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,10 +27,9 @@ function FileUpload() {
 
       setLoading(false);
       if (response.ok) {
-        // setLoading(false);
-      } else {
-        console.error("File upload failed");
-      }
+        const data = await response.json();
+        addFile(data.data.file);
+      } 
     } catch (error) {
       setLoading(false);
       console.error(error);
