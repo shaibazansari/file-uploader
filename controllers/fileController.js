@@ -43,3 +43,23 @@ exports.getAllFiles = async (req, res) => {
     res.status(500).json({ status: "error", message: "Failed to retrieve files" });
   }
 };
+
+exports.downloadFile = async (req, res) => {
+  try {
+    const file = await File.findOne({ id: req.params.id, user: req.user._id });
+
+    if (!file) {
+      throw new Error("File not found")
+    }
+
+    const filePath = path.join(UPLOAD_DIR, file.fileName)
+
+    res.download(filePath);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+

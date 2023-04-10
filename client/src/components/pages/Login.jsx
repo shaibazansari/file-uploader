@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 const CLIENT_ID = "447235254500-rb8ssec8iu96cqqjnef09mee6ksp1aa3.apps.googleusercontent.com";
 
@@ -18,8 +18,6 @@ function Login({ handleSetUser }) {
     if (response.ok) {
       const data = await response.json();
       handleSetUser(data.user)
-    } else {
-      console.error("Failed to fetch files");
     }
   };
   useEffect(() => {

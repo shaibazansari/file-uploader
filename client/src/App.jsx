@@ -19,8 +19,8 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        setLoading(false)
       }
+      setLoading(false)
     } catch (error) {
       console.error(error);
       setLoading(false)
@@ -35,7 +35,7 @@ function App() {
     setUser(user)
   }
 
-  return loading ? <Loader /> : user ? <Home user={user} /> : <Login handleSetUser={handleSetUser}/>;
+  return loading ? <Loader /> : user ? <Home user={user} setUser={setUser}/> : <Login handleSetUser={handleSetUser}/>;
 }
 
 export default App;

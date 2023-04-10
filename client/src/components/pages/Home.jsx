@@ -3,7 +3,7 @@ import FileUpload from "../fileupload/FileUpload";
 import FileList from "../fileupload/FileList";
 import Header from "../layout/Header";
 
-function Home({ user }) {
+function Home({ user, setUser }) {
   const [files, setFiles] = useState([]);
 
   const fetchFiles = async () => {
@@ -15,11 +15,9 @@ function Home({ user }) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("here response", response, data);
         setFiles(data.data.files);
-      } else {
-        console.error("Failed to fetch files");
       }
+      
     } catch (error) {
       console.error(error);
     }
@@ -36,7 +34,7 @@ function Home({ user }) {
 
   return (
     <>
-      <Header user={user}/>
+      <Header user={user} setUser={setUser}/>
       <div className="content">
         <div className="container">
           <div className="card">

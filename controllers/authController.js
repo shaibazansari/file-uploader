@@ -15,7 +15,9 @@ const signToken = (id) => {
 const setToken = (user, res) => {
   const token = signToken(user._id);
   let cookieOptions = {
-    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
     httpOnly: true,
   };
 
@@ -77,59 +79,80 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.protect = async (req, res, next) => {
+exports.checkLoggedIn = async (req, res) => {
   const token = req.cookies.jwt;
+  try {
+    if (!token) {
+      throw new Error("You are not logged in! Please log in to get access", {
+        status: 401,
+      })
+    }
 
-  if (!token) {
-    return res.status(401).json({
+    const decoded = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
+
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      throw new Error("The user belonging to this token does no longer exist", {
+        status: 404,
+      })
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Login was successful",
+      user: currentUser,
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({
       status: "error",
-      message: "You are not logged in! Please log in to get access",
+      message: err.message,
     });
   }
-
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-  const currentUser = await User.findById(decoded.id);
-  if (!currentUser) {
-    return res.status(401).json({
-      status: "error",
-      message: "The user belonging to this token does no longer exist",
-    });
-  }
-
-  req.user = currentUser;
-  next();
 };
 
-exports.checkLoggedIn = async (req, res, next) => {
-  const token = req.cookies.jwt;
-    try {
-      if (!token) {
-        return res.status(401).json({
-          status: "error",
-          message: "You are not logged in! Please log in to get access",
-        });
-      }
+exports.logout = async (req, res) => {
+  try {
+    res.cookie("jwt", "LoggedOut", {
+      expires: new Date(Date.now() + 1 * 1000),
+      httpOnly: true,
+    });
+    res.status(200).json({
+      status: "success",
+      message: "Logged out successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Technical error!"
+    });
+  }
+};
 
-      const decoded = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
+exports.protect = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
 
-      const currentUser = await User.findById(decoded.id);
-      if (!currentUser) {
-        return res.status(401).json({
-          status: "error",
-          message: "The user belonging to this token does no longer exist",
-        });
-      }
-
-      return res.status(201).json({
-        status: "success",
-        message: "Login was successful",
-        user: currentUser,
-      });
-    } catch (err) {
-      return res.status(401).json({
-        status: "error",
-        message: err,
-      });
+    if (!token) {
+      throw new Error("You are not logged in! Please log in to get access", {
+        status: 401,
+      })
     }
+  
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      throw new Error("The user belonging to this token does no longer exist", {
+        status: 404,
+      })
+    }
+  
+    req.user = currentUser;
+    next();
+  } catch (err) {
+    return res.status(err.status || 500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
 };
