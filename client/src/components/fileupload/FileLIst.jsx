@@ -3,6 +3,15 @@ function FileList({ files }) {
     return new Date(date).toLocaleDateString();
   };
 
+  const getFileSize = (size) =>  {
+    var i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+    return (
+      (size / Math.pow(1024, i)).toFixed(2) * 1 +
+      " " +
+      ["B", "kB", "MB", "GB", "TB"][i]
+    );
+  }
+
   const downloadFile = async (name, id) => {
     try {
       const response = await fetch("/api/files/" + id + "/download", {
@@ -50,7 +59,7 @@ function FileList({ files }) {
               <tr key={file._id}>
                 <th>{index + 1}</th>
                 <td>{file.originalName}</td>
-                <td>{file.size}</td>
+                <td>{getFileSize(file.size)}</td>
                 <td>{getDate(file.uploadedOn)}</td>
                 <td>
                   <button
