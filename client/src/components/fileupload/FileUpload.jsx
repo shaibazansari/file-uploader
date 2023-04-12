@@ -29,7 +29,7 @@ function FileUpload({ addFile }) {
       if (response.ok) {
         const data = await response.json();
         addFile(data.data.file);
-      } 
+      }
     } catch (error) {
       setLoading(false);
       console.error(error);
