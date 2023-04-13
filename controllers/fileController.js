@@ -2,8 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const File = require("../models/fileModel");
 
-const UPLOAD_DIR = "public/uploads";
-
 exports.uploadFile = async (req, res) => {
   const file = req.file;
 
@@ -26,8 +24,9 @@ exports.uploadFile = async (req, res) => {
     });
   } catch (error) {
     console.log("here error", error);
-    if (fs.existsSync(path.join(UPLOAD_DIR, file.filename))) {
-      fs.unlinkSync(path.join(UPLOAD_DIR, file.filename));
+    const directory = "public/uploads";
+    if (fs.existsSync(path.join(directory, file.filename))) {
+      fs.unlinkSync(path.join(directory, file.filename));
     }
     res.status(500).json({ status: "error", message: "Failed to upload file" });
   }
@@ -53,7 +52,8 @@ exports.downloadFile = async (req, res) => {
       throw new Error("File not found");
     }
 
-    const filePath = path.join(UPLOAD_DIR, file.fileName);
+    const directory = "public/uploads";
+    const filePath = path.join(directory, file.fileName);
 
     res.download(filePath);
   } catch (error) {
