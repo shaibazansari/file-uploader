@@ -15,9 +15,7 @@ const signToken = (id) => {
 const setToken = (user, res) => {
   const token = signToken(user._id);
   let cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true,
   };
 
@@ -26,7 +24,7 @@ const setToken = (user, res) => {
   res.cookie("jwt", token, cookieOptions);
 };
 
-async function verifyGoogleToken(token) {
+const verifyGoogleToken = async (token) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
@@ -36,7 +34,7 @@ async function verifyGoogleToken(token) {
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
   }
-}
+};
 
 exports.login = async (req, res) => {
   try {
@@ -85,7 +83,7 @@ exports.checkLoggedIn = async (req, res) => {
     if (!token) {
       throw new Error("You are not logged in! Please log in to get access", {
         status: 401,
-      })
+      });
     }
 
     const decoded = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
@@ -94,7 +92,7 @@ exports.checkLoggedIn = async (req, res) => {
     if (!currentUser) {
       throw new Error("The user belonging to this token does no longer exist", {
         status: 404,
-      })
+      });
     }
 
     return res.status(200).json({
@@ -118,12 +116,12 @@ exports.logout = async (req, res) => {
     });
     res.status(200).json({
       status: "success",
-      message: "Logged out successfully"
+      message: "Logged out successfully",
     });
   } catch (error) {
     res.status(500).json({
       status: "error",
-      message: "Technical error!"
+      message: "Technical error!",
     });
   }
 };
@@ -135,18 +133,18 @@ exports.protect = async (req, res, next) => {
     if (!token) {
       throw new Error("You are not logged in! Please log in to get access", {
         status: 401,
-      })
+      });
     }
-  
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
+
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       throw new Error("The user belonging to this token does no longer exist", {
         status: 404,
-      })
+      });
     }
-  
+
     req.user = currentUser;
     next();
   } catch (err) {
