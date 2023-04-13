@@ -12,7 +12,7 @@ exports.uploadFile = async (req, res) => {
       originalName: file.originalname,
       size: file.size,
       fileName: file.filename,
-      user: req.user._id
+      user: req.user._id,
     });
 
     await newFile.save();
@@ -21,10 +21,11 @@ exports.uploadFile = async (req, res) => {
       status: "success",
       message: "File created",
       data: {
-        file: newFile
-      }
+        file: newFile,
+      },
     });
   } catch (error) {
+    console.log("here error", error);
     if (fs.existsSync(path.join(UPLOAD_DIR, file.filename))) {
       fs.unlinkSync(path.join(UPLOAD_DIR, file.filename));
     }
@@ -49,10 +50,10 @@ exports.downloadFile = async (req, res) => {
     const file = await File.findOne({ id: req.params.id, user: req.user._id });
 
     if (!file) {
-      throw new Error("File not found")
+      throw new Error("File not found");
     }
 
-    const filePath = path.join(UPLOAD_DIR, file.fileName)
+    const filePath = path.join(UPLOAD_DIR, file.fileName);
 
     res.download(filePath);
   } catch (error) {
@@ -61,5 +62,3 @@ exports.downloadFile = async (req, res) => {
     res.status(500).json({ status: "error", message: error.message });
   }
 };
-
-
