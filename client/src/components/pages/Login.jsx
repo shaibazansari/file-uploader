@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 
-const CLIENT_ID = "447235254500-rb8ssec8iu96cqqjnef09mee6ksp1aa3.apps.googleusercontent.com";
-
 function Login({ handleSetUser }) {
   const handleSuccess = async (data) => {
     console.log(data);
@@ -17,13 +15,13 @@ function Login({ handleSetUser }) {
 
     if (response.ok) {
       const data = await response.json();
-      handleSetUser(data.user)
+      handleSetUser(data.user);
     }
   };
   useEffect(() => {
     if (window.google) {
       google.accounts.id.initialize({
-        client_id: CLIENT_ID,
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleSuccess,
       });
 
