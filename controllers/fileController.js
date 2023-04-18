@@ -46,13 +46,13 @@ exports.getAllFiles = async (req, res) => {
 
 exports.downloadFile = async (req, res) => {
   try {
-    const file = await File.findOne({ id: req.params.id, user: req.user._id });
+    const file = await File.findOne({ _id: req.params.id, user: req.user._id });
 
     if (!file) {
       throw new Error("File not found");
     }
 
-    const directory = "public/uploads";
+    const directory = "./public/uploads";
     const filePath = path.join(directory, file.fileName);
 
     res.download(filePath);

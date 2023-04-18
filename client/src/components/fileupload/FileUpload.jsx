@@ -1,23 +1,24 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 function FileUpload({ addFile }) {
-  const [file, setFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+    setSelectedFile(event.target.files[0]);
   };
 
   const handleUpload = async (event) => {
     event.preventDefault();
 
-    if (loading || !file) return;
+    if (loading || !selectedFile) return;
 
     setLoading(true);
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", selectedFile);
 
       const response = await fetch("/api/files/upload", {
         method: "POST",
@@ -29,6 +30,8 @@ function FileUpload({ addFile }) {
       if (response.ok) {
         const data = await response.json();
         addFile(data.data.file);
+        setSelectedFile(null);
+        fileInputRef.current.value = "";
       }
     } catch (error) {
       setLoading(false);
@@ -38,14 +41,14 @@ function FileUpload({ addFile }) {
 
   return (
     <div className="input-group">
-      <input type="file" className="form-control" onChange={handleFileChange} />
+      <input type="file" className="form-control" ref={fileInputRef} onChange={handleFileChange} />
       {loading ? (
         <button className="btn btn-success" type="button" disabled>
           <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Uploading...
         </button>
       ) : (
-        <button className={"btn btn-success " + (!file ? "disabled" : "")} onClick={handleUpload}>
+        <button className={"btn btn-success " + (!selectedFile ? "disabled" : "")} onClick={handleUpload}>
           Upload
         </button>
       )}

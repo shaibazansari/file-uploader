@@ -81,18 +81,18 @@ exports.checkLoggedIn = async (req, res) => {
   const token = req.cookies.jwt;
   try {
     if (!token) {
-      throw new Error("You are not logged in! Please log in to get access", {
-        status: 401,
-      });
+      const err = new Error("You are not logged in! Please log in to get access");
+      err.code = 401;
+      throw err;
     }
 
     const decoded = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
 
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
-      throw new Error("The user belonging to this token does no longer exist", {
-        status: 404,
-      });
+      const err = new Error("YoThe user belonging to this token does no longer exist");
+      err.code = 404;
+      throw err;
     }
 
     return res.status(200).json({
@@ -101,7 +101,7 @@ exports.checkLoggedIn = async (req, res) => {
       user: currentUser,
     });
   } catch (err) {
-    return res.status(err.status || 500).json({
+    return res.status(err.code || 500).json({
       status: "error",
       message: err.message,
     });
@@ -131,24 +131,24 @@ exports.protect = async (req, res, next) => {
     const token = req.cookies.jwt;
 
     if (!token) {
-      throw new Error("You are not logged in! Please log in to get access", {
-        status: 401,
-      });
+      const err = new Error("You are not logged in! Please log in to get access");
+      err.code = 401;
+      throw err;
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
-      throw new Error("The user belonging to this token does no longer exist", {
-        status: 404,
-      });
+      const err = new Error("YoThe user belonging to this token does no longer exist");
+      err.code = 404;
+      throw err;
     }
 
     req.user = currentUser;
     next();
   } catch (err) {
-    return res.status(err.status || 500).json({
+    return res.status(err.code || 500).json({
       status: "error",
       message: err.message,
     });
